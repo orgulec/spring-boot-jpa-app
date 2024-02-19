@@ -22,53 +22,58 @@ public class DepartmentController {
     private final DepartmentRepository departmentRepository;
 
     @GetMapping("/all")
-    public ResponseEntity<List<Department>> fingAll(){
+    public ResponseEntity<List<Department>> fingAll() {
         return ResponseEntity.ok(departmentService.findAll());
     }
+
     @GetMapping("/findByName/{departmentName}")
-    public ResponseEntity<Department> findByName(@PathVariable String departmentName){
+    public ResponseEntity<Department> findByName(@PathVariable String departmentName) {
         Department departmentByName = departmentService.findDepartmentByName(departmentName);
         return ResponseEntity.ok(departmentByName);
     }
+
     @GetMapping("/findById/{id}")
-    public ResponseEntity<Department> findById(@PathVariable Long id){
+    public ResponseEntity<Department> findById(@PathVariable Long id) {
         Department departmentByName = departmentService.findById(id);
         return ResponseEntity.ok(departmentByName);
     }
 
     @GetMapping("/findByCity")
-    public ResponseEntity<List<Department>> findByCity(@RequestParam String city){
+    public ResponseEntity<List<Department>> findByCity(@RequestParam String city) {
         List<Department> departments = departmentService.findDepartmentsByCity(city);
         return ResponseEntity.ok(departments);
     }
+
     @GetMapping("/findByCountry")
-    public ResponseEntity<List<Department>> findByCountry(@RequestParam String country){
+    public ResponseEntity<List<Department>> findByCountry(@RequestParam String country) {
         List<Department> departments = departmentService.findDepartmentsByCountry(country);
         return ResponseEntity.ok(departments);
     }
+
     @GetMapping("/findByEmployee")
-    public ResponseEntity<Department> findDepartmentByEmployee(@RequestParam String firstName, String lastName){
+    public ResponseEntity<Department> findDepartmentByEmployee(@RequestParam String firstName, String lastName) {
         return ResponseEntity.ok(departmentService.findByEmployee(firstName, lastName));
     }
+
     @GetMapping("/findByEmployeeBody")
-    public ResponseEntity<Department> findDepartmentByEmployees(@RequestBody Employee employee){
+    public ResponseEntity<Department> findDepartmentByEmployees(@RequestBody Employee employee) {
         return ResponseEntity.ok(departmentService.findDepartmentByEmployees(employee));
     }
-    @PostMapping("/addNew")
-    public ResponseEntity<Department> addNewDepartment(@RequestBody DepartmentRequest departmentRequest){
-        Department newDepartment = new Department();
-        newDepartment.setName(departmentRequest.getName());
-        newDepartment.setAddress(departmentRequest.getAddress());
 
+    @PostMapping("/addNew")
+    public ResponseEntity<Department> addNewDepartment(@RequestBody DepartmentRequest departmentRequest) {
+        Department newDepartment = departmentService.addNewDepartment(departmentRequest);
         return ResponseEntity.ok(departmentRepository.save(newDepartment));
     }
+
     @PostMapping("/addEmployeeToDepartment")
-    public ResponseEntity<Department> addEmployeeToDepartment(@RequestParam String departmentName, String firstName, String lastName){
+    public ResponseEntity<Department> addEmployeeToDepartment(@RequestParam String departmentName, String firstName, String lastName) {
         Department updatedDepartment = departmentService.addEmployeeToDepartment(departmentName, firstName, lastName);
         return ResponseEntity.ok(departmentRepository.save(updatedDepartment));
     }
+
     @PostMapping("/editDepartment/{id}")
-    public ResponseEntity<Department> editDepartment(@PathVariable Long id, @RequestBody DepartmentRequest departmentRequest){
+    public ResponseEntity<Department> editDepartment(@PathVariable Long id, @RequestBody DepartmentRequest departmentRequest) {
         Department editedDepartmentById = departmentService.editDepartmentById(id, departmentRequest);
 
         return ResponseEntity.ok(departmentRepository.save(editedDepartmentById));

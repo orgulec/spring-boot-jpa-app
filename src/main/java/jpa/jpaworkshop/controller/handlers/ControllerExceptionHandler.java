@@ -1,5 +1,6 @@
 package jpa.jpaworkshop.controller.handlers;
 
+import jpa.jpaworkshop.exceptions.DepartmentAlreadyExistException;
 import jpa.jpaworkshop.exceptions.EmployeeAlreadyInDepartmentException;
 import jpa.jpaworkshop.exceptions.NoDepartmentFoundedException;
 import jpa.jpaworkshop.exceptions.NoEmployeeFoundedException;
@@ -18,6 +19,10 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(NoEmployeeFoundedException.class)
     public ResponseEntity<String> handleNoEmployeeFoundedException(NoEmployeeFoundedException ex){
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+    @ExceptionHandler(DepartmentAlreadyExistException.class)
+    public ResponseEntity<String> handleDepartmentAlreadyExistException(DepartmentAlreadyExistException ex){
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
     }
 
     @ExceptionHandler(EmployeeAlreadyInDepartmentException.class)
