@@ -11,7 +11,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Getter
 @Setter
-//@ToString
 public class Employee {
 
     @Id
@@ -34,5 +33,10 @@ public class Employee {
 
     @OneToOne   //relacja 1:1
     private EntryCard entryCard;
+
+    @ManyToOne
+    @JoinColumn(name = "supervisor_id")
+    @JsonBackReference
+    private Supervisor supervisor;
 
 }

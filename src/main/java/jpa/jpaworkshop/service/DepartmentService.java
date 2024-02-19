@@ -3,6 +3,7 @@ package jpa.jpaworkshop.service;
 import jpa.jpaworkshop.exceptions.DepartmentAlreadyExistException;
 import jpa.jpaworkshop.exceptions.EmployeeAlreadyInDepartmentException;
 import jpa.jpaworkshop.exceptions.NoDepartmentFoundedException;
+import jpa.jpaworkshop.model.dto.DepartmentDto;
 import jpa.jpaworkshop.model.dto.DepartmentRequest;
 import jpa.jpaworkshop.model.entity.Department;
 import jpa.jpaworkshop.model.entity.Employee;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -21,6 +23,7 @@ import java.util.Optional;
 public class DepartmentService {
     private final DepartmentRepository departmentRepository;
     private final EmployeeService employeeService;
+    private final DepartmentMapper departmentMapper;
 
     public List<Department> findAll() {
         return departmentRepository.findAllBy();
@@ -36,6 +39,15 @@ public class DepartmentService {
         Optional<Department> optionalDepartment = departmentRepository.findByName(name);
         log.info("Finding department by name: " + name);
         return optionalDepartment.orElseThrow(NoDepartmentFoundedException::new);
+    }
+
+    public List<DepartmentDto> findAllByName(String depName) {
+        List<Department> allByName = departmentRepository.findAllByName(depName);
+        log.info("Finding department by name: " + depName);
+
+        return allByName.stream()
+                .map(entity -> departmentMapper.toDto(entity))
+                .collect(Collectors.toList());
     }
 
     public List<Department> findDepartmentsByCity(String city) {
@@ -70,10 +82,10 @@ public class DepartmentService {
         if (checkDepartment.isPresent()) {
             throw new DepartmentAlreadyExistException(departmentRequest.getName());
         }
-        Department newDepartment = new Department();
+        DepartmentDto newDepartment = new DepartmentDto();
         newDepartment.setName(departmentRequest.getName());
         newDepartment.setAddress(departmentRequest.getAddress());
-        return newDepartment;
+        return departmentMapper.toEntity(newDepartment);
     }
 
     public Department addEmployeeToDepartment(String depName, String employeeFirstName, String employeeLastName) {

@@ -1,6 +1,6 @@
 package jpa.jpaworkshop.controller;
 
-import jpa.jpaworkshop.exceptions.NoDepartmentFoundedException;
+import jpa.jpaworkshop.model.dto.DepartmentDto;
 import jpa.jpaworkshop.model.dto.DepartmentRequest;
 import jpa.jpaworkshop.model.entity.Department;
 import jpa.jpaworkshop.model.entity.Employee;
@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/department")
@@ -30,6 +29,11 @@ public class DepartmentController {
     public ResponseEntity<Department> findByName(@PathVariable String departmentName) {
         Department departmentByName = departmentService.findDepartmentByName(departmentName);
         return ResponseEntity.ok(departmentByName);
+    }
+    @GetMapping("/findAllByName")
+    public ResponseEntity<List<DepartmentDto>> findAllByName(@RequestParam String departmentName) {
+        List<DepartmentDto> allByName = departmentService.findAllByName(departmentName);
+        return ResponseEntity.ok(allByName);
     }
 
     @GetMapping("/findById/{id}")
