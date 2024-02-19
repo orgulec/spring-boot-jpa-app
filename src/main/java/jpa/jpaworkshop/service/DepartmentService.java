@@ -1,18 +1,24 @@
 package jpa.jpaworkshop.service;
 
+import jakarta.transaction.Transactional;
 import jpa.jpaworkshop.exceptions.DepartmentAlreadyExistException;
 import jpa.jpaworkshop.exceptions.EmployeeAlreadyInDepartmentException;
 import jpa.jpaworkshop.exceptions.NoDepartmentFoundedException;
 import jpa.jpaworkshop.model.dto.DepartmentDto;
 import jpa.jpaworkshop.model.dto.DepartmentRequest;
+import jpa.jpaworkshop.model.dto.EmployeeDto;
 import jpa.jpaworkshop.model.entity.Department;
 import jpa.jpaworkshop.model.entity.Employee;
 import jpa.jpaworkshop.repository.DepartmentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,6 +30,7 @@ public class DepartmentService {
     private final DepartmentRepository departmentRepository;
     private final EmployeeService employeeService;
     private final DepartmentMapper departmentMapper;
+    private final EmployeeMapper employeeMapper;
 
     public List<Department> findAll() {
         return departmentRepository.findAllBy();
@@ -77,6 +84,7 @@ public class DepartmentService {
         return optDepartment.orElseThrow(NoDepartmentFoundedException::new);
     }
 
+    @Transactional
     public Department addNewDepartment(DepartmentRequest departmentRequest) {
         Optional<Department> checkDepartment = departmentRepository.findByName(departmentRequest.getName());
         if (checkDepartment.isPresent()) {
@@ -88,8 +96,13 @@ public class DepartmentService {
         return departmentMapper.toEntity(newDepartment);
     }
 
+//    @Transactional(rollbackOn = SQLException.class)
+
+
+    @Transactional
     public Department addEmployeeToDepartment(String depName, String employeeFirstName, String employeeLastName) {
-        Employee employee = employeeService.findEmployeeByFirstNameAndLastName(employeeFirstName, employeeLastName);
+        EmployeeDto employeeDto = employeeService.findEmployeeByFirstNameAndLastName(employeeFirstName, employeeLastName);
+        Employee employee = employeeMapper.toEntity(employeeDto);
 
         Optional<Department> department = departmentRepository.findByName(depName);
         List<Employee> depEmployees = department.get().getEmployees();
@@ -103,6 +116,7 @@ public class DepartmentService {
         return department.get();
     }
 
+    @Transactional
     public Department editDepartmentById(Long id, DepartmentRequest departmentRequest) {
         Optional<Department> optDepartment = departmentRepository.findById(id);
         if (optDepartment.isEmpty()) {
@@ -115,5 +129,23 @@ public class DepartmentService {
         return editDepartment;
     }
 
+    @Transactional
+    public List<Department> deleteById(Long id) {
+        Optional<Department> optDepartment = departmentRepository.findById(id);
+        if (optDepartment.isEmpty()) {
+            throw new NoDepartmentFoundedException();
+        }
+        //TODO
+/*        optDepartment.get().getEmployees()
+                        .stream()
+                                .filter(e -> {
+                                    () -> e.setDepartment(null)
 
+                                })
+*/
+        departmentRepository.save(optDepartment.get());
+
+        departmentRepository.deleteDepartmentById(id);
+        return new ArrayList<>(departmentRepository.findAllBy());
+    }
 }

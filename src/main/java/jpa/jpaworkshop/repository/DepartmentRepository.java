@@ -24,4 +24,6 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
     Optional<List<Department>> findAllByAddress_Country(String country);
     Optional<Department> findByEmployeesIsContaining(Employee employee);
     Optional<Department> findDepartmentByEmployeesContains(Employee employee);
+    Optional<Department> deleteDepartmentById(Long id);
+
 }

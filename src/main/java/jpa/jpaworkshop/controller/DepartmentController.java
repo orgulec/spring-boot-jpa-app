@@ -79,8 +79,11 @@ public class DepartmentController {
     @PostMapping("/editDepartment/{id}")
     public ResponseEntity<Department> editDepartment(@PathVariable Long id, @RequestBody DepartmentRequest departmentRequest) {
         Department editedDepartmentById = departmentService.editDepartmentById(id, departmentRequest);
-
         return ResponseEntity.ok(departmentRepository.save(editedDepartmentById));
+    }
+    @PostMapping("/deleteById")
+    public ResponseEntity<List<Department>> deleteDepartmentById(@RequestParam Long id){
+        return ResponseEntity.ok(departmentService.deleteById(id));
     }
 
 
