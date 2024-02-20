@@ -53,6 +53,14 @@ public class EmplyeeController {
         BigDecimal salaryMax = BigDecimal.valueOf(max);
         return ResponseEntity.ok(employeeService.findEmployeeBySalaryBetweenMinMax(salaryMin, salaryMax));
     }
+    @GetMapping("/findBySalaryLess/{salary}")
+    public ResponseEntity<List<EmployeeDto>> findBySalaryLess(@PathVariable BigDecimal salary){
+        return ResponseEntity.ok(employeeService.findAllBySalaryLessThan(salary));
+    }
+    @GetMapping("/findBySalaryMore/{salary}")
+    public ResponseEntity<List<EmployeeDto>> findBySalaryMore(@PathVariable BigDecimal salary){
+        return ResponseEntity.ok(employeeService.findAllBySalaryMoreThan(salary));
+    }
 
 
 }

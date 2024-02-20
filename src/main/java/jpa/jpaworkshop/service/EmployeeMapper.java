@@ -12,7 +12,6 @@ public class EmployeeMapper {
         dto.setLastName(entity.getLastName());
         dto.setSalary(entity.getSalary());
         dto.setContractEnd(entity.getContractEnd());
-//        dto.setDepartment(entity.getDepartment());
         return dto;
     }
 
@@ -22,7 +21,6 @@ public class EmployeeMapper {
         entity.setLastName(dto.getLastName());
         entity.setSalary(dto.getSalary());
         entity.setContractEnd(dto.getContractEnd());
-//        entity.setDepartment(dto.getDepartment());
         return entity;
     }
 }

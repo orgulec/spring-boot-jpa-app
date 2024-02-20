@@ -20,5 +20,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     @Query(value = "SELECT e FROM Employee e WHERE e.salary BETWEEN :min AND :max ")
     List<Employee> findEmployeeBySalaryBetweenMinMax(BigDecimal min, BigDecimal max);
 
+    List<Employee> findEmployeesBySalaryLessThanOrderBySalaryDesc(BigDecimal salary);
+    List<Employee> findEmployeesBySalaryIsGreaterThanOrderBySalaryDesc(BigDecimal salary);
+
 
 }

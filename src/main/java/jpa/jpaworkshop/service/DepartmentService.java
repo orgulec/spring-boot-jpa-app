@@ -10,15 +10,13 @@ import jpa.jpaworkshop.model.dto.EmployeeDto;
 import jpa.jpaworkshop.model.entity.Department;
 import jpa.jpaworkshop.model.entity.Employee;
 import jpa.jpaworkshop.repository.DepartmentRepository;
+import jpa.jpaworkshop.repository.EmployeeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,6 +26,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DepartmentService {
     private final DepartmentRepository departmentRepository;
+    private final EmployeeRepository employeeRepository;
     private final EmployeeService employeeService;
     private final DepartmentMapper departmentMapper;
     private final EmployeeMapper employeeMapper;
@@ -53,7 +52,8 @@ public class DepartmentService {
         log.info("Finding department by name: " + depName);
 
         return allByName.stream()
-                .map(entity -> departmentMapper.toDto(entity))
+//                .map(entity -> departmentMapper.toDto(entity))
+                .map(departmentMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -96,9 +96,6 @@ public class DepartmentService {
         return departmentMapper.toEntity(newDepartment);
     }
 
-//    @Transactional(rollbackOn = SQLException.class)
-
-
     @Transactional
     public Department addEmployeeToDepartment(String depName, String employeeFirstName, String employeeLastName) {
         EmployeeDto employeeDto = employeeService.findEmployeeByFirstNameAndLastName(employeeFirstName, employeeLastName);
@@ -129,23 +126,24 @@ public class DepartmentService {
         return editDepartment;
     }
 
+//    @Transactional(rollbackOn = SQLException.class)
     @Transactional
     public List<Department> deleteById(Long id) {
         Optional<Department> optDepartment = departmentRepository.findById(id);
         if (optDepartment.isEmpty()) {
             throw new NoDepartmentFoundedException();
         }
-        //TODO
-/*        optDepartment.get().getEmployees()
-                        .stream()
-                                .filter(e -> {
-                                    () -> e.setDepartment(null)
-
-                                })
-*/
-        departmentRepository.save(optDepartment.get());
+        Department departmentToRemove = optDepartment.get();
+        List<Employee> employeeList = departmentToRemove.getEmployees();
+        employeeList.forEach(e -> {
+            e.setDepartment(null);
+            employeeRepository.save(e);
+        });
+        departmentToRemove.getEmployees().removeAll(employeeList);
+        departmentRepository.save(departmentToRemove);
 
         departmentRepository.deleteDepartmentById(id);
         return new ArrayList<>(departmentRepository.findAllBy());
     }
+
 }
